@@ -3,11 +3,18 @@ const TabelaFornecedor = require('./TabelaFornecedor')
 const Fornecedor = require('./Fornecedor')
 const SerializadorFornecedor = require('../../Serializador').SerializadorFornecedor
 
+roteador.options('/', (req, res)=>{
+    res.set('Access-Control-Allow-Methods', 'GET, POST')
+    res.set('Access-Control-Allow-Headers', 'Content-Type')
+    res.status(204)
+    res.end()
+})
+
 roteador.get( '/', async(req, res)=>{
     const resultados = await TabelaFornecedor.listar()
     res.status(200)
     const serializador = new SerializadorFornecedor(
-        res.getHeader('Content-Type')
+        res.getHeader('Content-Type'), ['empresa']
     )
     res.send(
         serializador.serializar(resultados)
@@ -21,7 +28,7 @@ roteador.post('/', async (req, res, proximo) => {
         await fornecedor.criar()
         res.status(201)
         const serializador = new SerializadorFornecedor(
-            res.getHeader('Content-Type')
+            res.getHeader('Content-Type'), ['empresa']
         )
         res.send(
             serializador.serializar(fornecedor)
@@ -29,6 +36,13 @@ roteador.post('/', async (req, res, proximo) => {
     }catch(erro){
         proximo(erro)
     }
+})
+
+roteador.options('/:idFornecedor', (req, res)=>{
+    res.set('Access-Control-Allow-Methods', 'GET, PUT, DELETE')
+    res.set('Access-Control-Allow-Headers', 'Content-Type')
+    res.status(204)
+    res.end()
 })
 
 roteador.get('/:idFornecedor', async (req, res, proximo) => {
@@ -39,7 +53,7 @@ roteador.get('/:idFornecedor', async (req, res, proximo) => {
         res.status(200)
         const serializador = new SerializadorFornecedor(
             res.getHeader('Content-Type'),
-            ['email', 'dataCriacao', 'dataAtualizacao', 'versao']
+            ['email', 'empresa', 'dataCriacao', 'dataAtualizacao', 'versao']
         ) 
         res.send(
             serializador.serializar(fornecedor)

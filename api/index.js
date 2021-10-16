@@ -28,9 +28,17 @@ app.use((req, res, proximo)=>{
     proximo()
 })
 
+app.use((req, res, proximo)=>{
+    res.set('Access-Control-Allow-Origin', '*')
+    proximo()
+})
+
 const roteador = require('./routers/fornecedores')
 const instancia = require('./banco-de-dados')
 app.use('/api/fornecedores', roteador)
+
+const roteadorV2 = require('./routers/fornecedores/rotas.v2')
+app.use('/api/v2/fornecedores', roteadorV2)
 
 app.use((erro, req, res, proximo)=>{
     let status = 500
